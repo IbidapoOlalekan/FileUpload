@@ -4,11 +4,14 @@ import com.springapi.uploading.model.Product;
 import com.springapi.uploading.service.ProductService;
 import com.springapi.uploading.service.ResponseClass;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -72,4 +75,49 @@ public class ProductController {
 
         return ResponseEntity.ok().body(responseClasses);
     }
+
+
+    //To upload SINGLE file to the File System
+    @PostMapping("/single/file")
+    public ResponseEntity<ResponseClass> handleFileUpload(@RequestParam("file") MultipartFile file){
+        String fileName = file.getOriginalFilename();
+        try{
+            file.transferTo(new File("C:\\Admin\\" + fileName));
+            String downloadUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
+                    .path("/download/")
+                    .path(fileName)
+                    .toUriString();
+            ResponseClass response = new ResponseClass(fileName,
+                    downloadUrl,
+                    file.getContentType(),
+                    file.getSize());
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    //uploading MULTIPLE Files to the file System
+    @PostMapping("/multiple/file")
+    public ResponseEntity<List<ResponseClass>> handleMultipleFilesUpload(@RequestParam("files") MultipartFile[] files){
+        List<ResponseClass> responseList = new ArrayList<>();
+        for(MultipartFile file:files){
+            String fileName = file.getOriginalFilename();
+            try{
+                file.transferTo(new File("C:\\Folder\\" + fileName));
+                String downloadUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
+                        .path("/download/")
+                        .path(fileName)
+                        .toUriString();
+                ResponseClass response = new ResponseClass(fileName,
+                        downloadUrl,
+                        file.getContentType(),
+                        file.getSize());
+                responseList.add(response);
+            } catch (Exception e){
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            }
+        }
+        return ResponseEntity.ok(responseList);
+    };
 }
