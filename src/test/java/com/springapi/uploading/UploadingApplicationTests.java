@@ -71,4 +71,13 @@ class UploadingApplicationTests {
 		assertThrows(Exception.class,()-> productService.saveAttachment(mockFile));
 	}
 
+	@Test
+	void testSaveAttachmentTooLarge(){
+		byte[] bytes = new byte[1024 * 1024 * 10];
+		MockMultipartFile mockFile = new MockMultipartFile(
+				"file","test.txt","text/plain",bytes
+		);
+		assertThrows(Exception.class, ()-> productService.saveAttachment(mockFile));
+	}
+
 }

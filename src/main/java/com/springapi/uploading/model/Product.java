@@ -1,5 +1,5 @@
 package com.springapi.uploading.model;
-
+//https://medium.com/@patelsajal2/how-to-create-a-spring-boot-rest-api-for-multipart-file-uploads-a-comprehensive-guide-b4d95ce3022b
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
